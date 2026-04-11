@@ -38,6 +38,27 @@ const transactions = [
   },
 ];
 
+const virtualCards = [
+  {
+    id: 'a',
+    label: 'SaaS',
+    amount: '$1,850',
+    subtitle: 'Productivity',
+  },
+  {
+    id: 'b',
+    label: 'Entertainment',
+    amount: '$680',
+    subtitle: 'Streaming',
+  },
+  {
+    id: 'c',
+    label: 'Utilities',
+    amount: '$540',
+    subtitle: 'Monthly bills',
+  },
+];
+
 export default function DashboardScreen() {
   return (
     <View style={styles.page}>
@@ -67,6 +88,22 @@ export default function DashboardScreen() {
           <TouchableOpacity style={[styles.actionButton, styles.actionSecondary]}>
             <Text style={styles.actionLabel}>Top up</Text>
           </TouchableOpacity>
+        </View>
+
+        <View style={styles.card}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Virtual Card Allocation</Text>
+            <Text style={styles.sectionMeta}>Budget categories</Text>
+          </View>
+          <View style={styles.allocationGrid}>
+            {virtualCards.map((card) => (
+              <View key={card.id} style={styles.allocationCard}>
+                <Text style={styles.allocationLabel}>{card.label}</Text>
+                <Text style={styles.allocationAmount}>{card.amount}</Text>
+                <Text style={styles.allocationMeta}>{card.subtitle}</Text>
+              </View>
+            ))}
+          </View>
         </View>
 
         <View style={styles.card}> 
@@ -202,5 +239,33 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
   },
-
+  allocationGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    gap: spacing.sm,
+  },
+  allocationCard: {
+    width: '48%',
+    backgroundColor: colors.surfaceAlt,
+    borderRadius: borderRadius.mild,
+    padding: spacing.md,
+    marginBottom: spacing.sm,
+  },
+  allocationLabel: {
+    color: colors.text,
+    fontSize: 14,
+    fontWeight: '700',
+    marginBottom: spacing.xs,
+  },
+  allocationAmount: {
+    color: colors.text,
+    fontSize: 22,
+    fontWeight: '900',
+    marginBottom: spacing.xs / 2,
+  },
+  allocationMeta: {
+    color: colors.muted,
+    fontSize: 12,
+  },
 });
