@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { borderRadius, colors, spacing } from '../constants/theme';
-
+import TransactionItem from '../components/TransactionItem';
 
 const transactions = [
   {
@@ -75,22 +75,15 @@ export default function DashboardScreen() {
             <Text style={styles.sectionMeta}>View all</Text>
           </View>
 
-          {transactions.map((transaction, index) => (
-            <View
+          {transactions.map((transaction) => (
+            <TransactionItem
               key={transaction.id}
-              style={[styles.transactionRow, index === transactions.length - 1 && styles.transactionRowLast]}
-            >
-              <View style={styles.transactionDetails}>
-                <Text style={styles.transactionName}>{transaction.merchant}</Text>
-                <Text style={styles.transactionMeta}>{transaction.category}</Text>
-              </View>
-              <View style={styles.transactionRight}>
-                <Text style={[styles.transactionAmount, transaction.positive && styles.positiveAmount]}>
-                  {transaction.amount}
-                </Text>
-                <Text style={styles.transactionDate}>{transaction.date}</Text>
-              </View>
-            </View>
+              title={transaction.merchant}
+              subtitle={transaction.category}
+              amount={transaction.amount}
+              date={transaction.date}
+              positive={transaction.positive}
+            />
           ))}
         </View>
       </ScrollView>
@@ -209,45 +202,5 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
   },
-  transactionRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: '#1d2a54',
-  },
-  transactionRowLast: {
-    borderBottomWidth: 0,
-  },
-  transactionDetails: {
-    flex: 1,
-    paddingRight: spacing.sm,
-  },
-  transactionName: {
-    color: colors.text,
-    fontSize: 15,
-    fontWeight: '700',
-  },
-  transactionMeta: {
-    color: colors.muted,
-    fontSize: 13,
-    marginTop: spacing.xs / 2,
-  },
-  transactionRight: {
-    alignItems: 'flex-end',
-  },
-  transactionAmount: {
-    color: colors.text,
-    fontSize: 15,
-    fontWeight: '800',
-  },
-  positiveAmount: {
-    color: colors.accent,
-  },
-  transactionDate: {
-    color: colors.muted,
-    fontSize: 12,
-    marginTop: spacing.xs / 2,
-  },
+
 });
