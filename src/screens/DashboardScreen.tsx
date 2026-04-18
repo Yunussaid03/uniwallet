@@ -1,126 +1,87 @@
 import { StatusBar } from 'expo-status-bar';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { borderRadius, colors, spacing } from '../constants/theme';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import QuickActionButton from '../components/QuickActionButton';
 import TransactionItem from '../components/TransactionItem';
-
-const transactions = [
-  {
-    id: '1',
-    merchant: 'Dubai Mall',
-    category: 'Shopping',
-    amount: '-$420.00',
-    date: 'Apr 10',
-    positive: false,
-  },
-  {
-    id: '2',
-    merchant: 'Payoneer',
-    category: 'Salary',
-    amount: '+$2,750.00',
-    date: 'Apr 09',
-    positive: true,
-  },
-  {
-    id: '3',
-    merchant: 'Coffee & Co.',
-    category: 'Dining',
-    amount: '-$14.20',
-    date: 'Apr 08',
-    positive: false,
-  },
-  {
-    id: '4',
-    merchant: 'Rent',
-    category: 'Housing',
-    amount: '-$1,200.00',
-    date: 'Apr 05',
-    positive: false,
-  },
-];
-
-const virtualCards = [
-  {
-    id: 'a',
-    label: 'SaaS',
-    amount: '$1,850',
-    subtitle: 'Productivity',
-  },
-  {
-    id: 'b',
-    label: 'Entertainment',
-    amount: '$680',
-    subtitle: 'Streaming',
-  },
-  {
-    id: 'c',
-    label: 'Utilities',
-    amount: '$540',
-    subtitle: 'Monthly bills',
-  },
-];
+import VirtualCard from '../components/VirtualCard';
+import { quickActions, transactionsByDate, virtualCards } from '../constants/mockData';
+import { borderRadius, colors, spacing, typography } from '../constants/theme';
 
 export default function DashboardScreen() {
   return (
     <View style={styles.page}>
       <StatusBar style="light" />
-      <View style={styles.header}>
-        <Text style={styles.subtitle}>UniWallet Lite</Text>
-        <Text style={styles.title}>Dashboard</Text>
-      </View>
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.card}>
-          <View style={styles.cardHeader}>
-            <Text style={styles.cardLabel}>Available Balance</Text>
-            <Text style={styles.cardBadge}>Premium</Text>
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.greeting}>Good morning, Ammar</Text>
+            <Text style={styles.subtitle}>Master Wallet dashboard</Text>
           </View>
-          <Text style={styles.balanceAmount}>$12,480.50</Text>
-          <Text style={styles.balanceSubtext}>+5.8% this month</Text>
-        </View>
-
-        <View style={styles.quickActions}> 
-          <TouchableOpacity style={[styles.actionButton, styles.actionPrimary]}>
-            <Text style={styles.actionLabel}>Send</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.actionButton, styles.actionSecondary]}>
-            <Text style={styles.actionLabel}>Request</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.actionButton, styles.actionSecondary]}>
-            <Text style={styles.actionLabel}>Top up</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.card}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Virtual Card Allocation</Text>
-            <Text style={styles.sectionMeta}>Budget categories</Text>
-          </View>
-          <View style={styles.allocationGrid}>
-            {virtualCards.map((card) => (
-              <View key={card.id} style={styles.allocationCard}>
-                <Text style={styles.allocationLabel}>{card.label}</Text>
-                <Text style={styles.allocationAmount}>{card.amount}</Text>
-                <Text style={styles.allocationMeta}>{card.subtitle}</Text>
-              </View>
-            ))}
+          <View style={styles.headerBadge}>
+            <Text style={styles.headerBadgeText}>3</Text>
           </View>
         </View>
 
-        <View style={styles.card}> 
+        <View style={styles.balanceCard}>
+          <Text style={styles.balanceLabel}>Available Balance</Text>
+          <Text style={styles.balanceAmount}>RM 450.00</Text>
+          <Text style={styles.balanceSubtext}>Live balance synced with your master wallet</Text>
+        </View>
+
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.actionsRow}
+        >
+          {quickActions.map((action, index) => (
+            <QuickActionButton key={action} label={action} primary={index === 0} />
+          ))}
+        </ScrollView>
+
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Virtual Cards</Text>
+          <Text style={styles.sectionMeta}>4 categories</Text>
+        </View>
+
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.carousel}
+        >
+          {virtualCards.map((card) => (
+            <VirtualCard
+              key={card.id}
+              label={card.label}
+              subtitle={card.subtitle}
+              balance={card.balance}
+              cardNumber={card.cardNumber}
+              accentColor={card.accentColor}
+            />
+          ))}
+        </ScrollView>
+
+        <View style={styles.sectionCard}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Recent Transactions</Text>
-            <Text style={styles.sectionMeta}>View all</Text>
+            <Text style={styles.sectionMeta}>Last 10</Text>
           </View>
 
-          {transactions.map((transaction) => (
-            <TransactionItem
-              key={transaction.id}
-              title={transaction.merchant}
-              subtitle={transaction.category}
-              amount={transaction.amount}
-              date={transaction.date}
-              positive={transaction.positive}
-            />
+          {transactionsByDate.map((group) => (
+            <View key={group.date} style={styles.transactionGroup}>
+              <Text style={styles.groupLabel}>{group.date}</Text>
+              {group.items.map((transaction) => (
+                <TransactionItem
+                  key={transaction.id}
+                  title={transaction.merchant}
+                  subtitle={transaction.category}
+                  amount={transaction.amount}
+                  date={transaction.time}
+                  accentColor={transaction.accent}
+                  positive={'positive' in transaction ? Boolean(transaction.positive) : false}
+                  isFee={'isFee' in transaction ? Boolean(transaction.isFee) : false}
+                />
+              ))}
+            </View>
           ))}
         </View>
       </ScrollView>
@@ -131,97 +92,74 @@ export default function DashboardScreen() {
 const styles = StyleSheet.create({
   page: {
     flex: 1,
-    backgroundColor: colors.background,
-  },
-  header: {
-    paddingTop: spacing.xl,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.md,
-  },
-  subtitle: {
-    color: colors.accent,
-    fontSize: 12,
-    letterSpacing: 1,
-    textTransform: 'uppercase',
-  },
-  title: {
-    color: colors.text,
-    fontSize: 34,
-    fontWeight: '800',
-    marginTop: spacing.sm,
+    backgroundColor: colors.bgBase,
   },
   content: {
     paddingHorizontal: spacing.lg,
+    paddingTop: spacing.xl,
     paddingBottom: spacing.xl,
   },
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: borderRadius.strong,
-    padding: spacing.lg,
-    marginBottom: spacing.lg,
-    shadowColor: '#000',
-    shadowOpacity: 0.12,
-    shadowRadius: 20,
-    shadowOffset: { width: 0, height: 12 },
-    elevation: 8,
-  },
-  cardHeader: {
+  header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: spacing.sm,
+    marginBottom: spacing.lg,
   },
-  cardLabel: {
-    color: colors.muted,
-    fontSize: 14,
+  greeting: {
+    color: colors.textPrimary,
+    fontSize: typography.title,
+    fontWeight: '800',
+  },
+  subtitle: {
+    color: colors.textSecondary,
+    fontSize: typography.body,
+    marginTop: spacing.xs,
+  },
+  headerBadge: {
+    width: 40,
+    height: 40,
+    borderRadius: borderRadius.pill,
+    backgroundColor: colors.glassStrong,
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerBadgeText: {
+    color: colors.textPrimary,
+    fontSize: typography.body,
+    fontWeight: '800',
+  },
+  balanceCard: {
+    backgroundColor: colors.bgSurface,
+    borderRadius: borderRadius.lg,
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
+    padding: spacing.lg,
+    shadowColor: colors.primary,
+    shadowOpacity: 0.28,
+    shadowRadius: 32,
+    shadowOffset: { width: 0, height: 18 },
+    elevation: 14,
+  },
+  balanceLabel: {
+    color: colors.textSecondary,
+    fontSize: typography.body,
     fontWeight: '600',
   },
-  cardBadge: {
-    color: colors.text,
-    backgroundColor: '#212b49',
-    paddingVertical: 6,
-    paddingHorizontal: 14,
-    borderRadius: 999,
-    fontSize: 12,
-    overflow: 'hidden',
-  },
   balanceAmount: {
-    color: colors.text,
-    fontSize: 42,
+    color: colors.textPrimary,
+    fontSize: typography.hero,
     fontWeight: '900',
     marginTop: spacing.sm,
   },
   balanceSubtext: {
-    color: colors.muted,
+    color: colors.textMuted,
+    fontSize: typography.body,
     marginTop: spacing.xs,
-    fontSize: 14,
   },
-  quickActions: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: spacing.sm,
-    marginBottom: spacing.lg,
-  },
-  actionButton: {
-    flex: 1,
-    borderRadius: borderRadius.mild,
-    paddingVertical: spacing.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 64,
-  },
-  actionPrimary: {
-    backgroundColor: colors.primary,
-  },
-  actionSecondary: {
-    backgroundColor: colors.surfaceAlt,
-    borderWidth: 1,
-    borderColor: '#1d2a54',
-  },
-  actionLabel: {
-    color: colors.text,
-    fontSize: 15,
-    fontWeight: '700',
+  actionsRow: {
+    paddingVertical: spacing.lg,
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -230,42 +168,34 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   sectionTitle: {
-    color: colors.text,
-    fontSize: 18,
+    color: colors.textPrimary,
+    fontSize: typography.section,
     fontWeight: '800',
   },
   sectionMeta: {
     color: colors.accent,
-    fontSize: 13,
+    fontSize: typography.caption,
     fontWeight: '700',
   },
-  allocationGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    gap: spacing.sm,
+  carousel: {
+    paddingBottom: spacing.lg,
   },
-  allocationCard: {
-    width: '48%',
-    backgroundColor: colors.surfaceAlt,
-    borderRadius: borderRadius.mild,
-    padding: spacing.md,
+  sectionCard: {
+    backgroundColor: colors.bgSurface,
+    borderRadius: borderRadius.lg,
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
+    padding: spacing.lg,
+  },
+  transactionGroup: {
+    marginTop: spacing.sm,
+  },
+  groupLabel: {
+    color: colors.textSecondary,
+    fontSize: typography.caption,
+    fontWeight: '700',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
     marginBottom: spacing.sm,
-  },
-  allocationLabel: {
-    color: colors.text,
-    fontSize: 14,
-    fontWeight: '700',
-    marginBottom: spacing.xs,
-  },
-  allocationAmount: {
-    color: colors.text,
-    fontSize: 22,
-    fontWeight: '900',
-    marginBottom: spacing.xs / 2,
-  },
-  allocationMeta: {
-    color: colors.muted,
-    fontSize: 12,
   },
 });
